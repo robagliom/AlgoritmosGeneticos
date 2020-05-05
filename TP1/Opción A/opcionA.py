@@ -18,7 +18,7 @@ long_cromosomas = 30
 #Crear población inicial (vamos a elegir cantidad inicial = 4)
 cant_pi = 10 #cantidad población inicial
 #Cantidad de corridas
-cant_corr = 100
+cant_corr = 200
 #Probabilidades
 #Crossover
 pc = 0.75
@@ -149,14 +149,16 @@ def crossover(n,cromosoma1,cromosoma2):
         corte = random.randrange(long_cromosomas)
         nuevo_cromosoma1[corte:]=cromosoma2[corte:]
         nuevo_cromosoma2[corte:]=cromosoma1[corte:]
-    if probabilidad_mutacion():
+    """if probabilidad_mutacion():
         nuevo_cromosoma1 = mutacion(nuevo_cromosoma1)
     else:
         nuevo_cromosoma1 = "".join(nuevo_cromosoma1)
     if probabilidad_mutacion():
         nuevo_cromosoma2 = mutacion(nuevo_cromosoma2)
     else:
-        nuevo_cromosoma2 = "".join(nuevo_cromosoma2)
+        nuevo_cromosoma2 = "".join(nuevo_cromosoma2)"""
+    nuevo_cromosoma1 = "".join(nuevo_cromosoma1)
+    nuevo_cromosoma2 = "".join(nuevo_cromosoma2)
     return nuevo_cromosoma1,nuevo_cromosoma2
 
 #Método de selección
@@ -174,13 +176,21 @@ def seleccion_ruleta(poblacion):
     for i in range(0,len(seleccion),2):
         cromosoma1 = poblacion[seleccion[i]]
         cromosoma2 = poblacion[seleccion[i+1]]
-        if probabilidad_crossover():
+        """""if probabilidad_crossover():
             nuevo_cromosoma1,nuevo_cromosoma2 = crossover(1,cromosoma1,cromosoma2)
             nueva_poblacion.append(nuevo_cromosoma1)
             nueva_poblacion.append(nuevo_cromosoma1)
         else:
             nueva_poblacion.append(cromosoma1)
-            nueva_poblacion.append(cromosoma2)
+            nueva_poblacion.append(cromosoma2)"""
+        if probabilidad_crossover():
+            cromosoma1,cromosoma2 = crossover(1,cromosoma1,cromosoma2)
+        if probabilidad_mutacion():
+            cromosoma1 = mutacion(cromosoma1)
+        if probabilidad_mutacion():
+            cromosoma2 = mutacion(cromosoma2)
+        nueva_poblacion.append(cromosoma1)
+        nueva_poblacion.append(cromosoma2)
     return nueva_poblacion
 
 #Argumentos:
