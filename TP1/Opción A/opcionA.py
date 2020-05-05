@@ -200,21 +200,12 @@ def programa_principal(cant_pi, cant_corridas):
         promedio = 0
         minimo = 2**30 #infinito
         maximo = 0
-        data_tabla = [] #para dibujar tabla
         tabla_corrida = []
         for i in range(cant_pi):
-            lista = [] #lista con datos de la corrida
-            #orden = i
-            lista.append(i)
             cromosoma = poblacion[i] #binario
-            lista.append(cromosoma)
             cromosoma_entero = int(poblacion[i],2) #decimal
-            lista.append(cromosoma_entero)
             valor_fo = funcion_objetivo(cromosoma_entero) #valor función objetivo
-            lista.append(valor_fo)
             valor_fit = funcion_fitness(valor_fo, poblacion)#valor fitness
-            lista.append(valor_fit)
-            data_tabla.append(lista)
             suma_fo += valor_fo
             promedio = suma_fo/cant_pi
             if valor_fo > maximo:
