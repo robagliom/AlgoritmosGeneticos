@@ -192,7 +192,7 @@ def seleccion_ruleta(poblacion):
         if probabilidad_mutacion():
             cromosoma2 = mutacion(cromosoma2)
         nueva_poblacion.append(cromosoma1)
-        nueva_poblacion.append(cromosoma2)            
+        nueva_poblacion.append(cromosoma2)
     return nueva_poblacion
 
 #Argumentos:
@@ -209,7 +209,6 @@ def programa_principal(cant_pi, cant_corridas):
 
     for c in range(cant_corridas):
         suma_fo = 0
-        promedio = 0
         minimo = 2**30 #infinito
         maximo = 0
         tabla_corrida = []
@@ -223,12 +222,12 @@ def programa_principal(cant_pi, cant_corridas):
             #para elitismo
             lista_fitness.append([cromosoma,valor_fit])
             suma_fo += valor_fo
-            promedio = suma_fo/len(poblacion)
             if valor_fo > maximo:
                 maximo = valor_fo
                 crom_maximo_corrida = cromosoma
             if valor_fo < minimo:
                 minimo = valor_fo
+        promedio = suma_fo/len(poblacion)
         if crom_maximo_corrida > cromosoma_maximo:
             cromosoma_maximo = crom_maximo_corrida
 

@@ -18,7 +18,7 @@ long_cromosomas = 30
 #Crear población inicial (vamos a elegir cantidad inicial = 4)
 cant_pi = 10 #cantidad población inicial
 #Cantidad de corridas
-cant_corr = 200
+cant_corr = 100
 #Probabilidades
 #Crossover
 pc = 0.75
@@ -207,7 +207,6 @@ def programa_principal(cant_pi, cant_corridas):
 
     for c in range(cant_corridas):
         suma_fo = 0
-        promedio = 0
         minimo = 2**30 #infinito
         maximo = 0
         tabla_corrida = []
@@ -217,12 +216,12 @@ def programa_principal(cant_pi, cant_corridas):
             valor_fo = funcion_objetivo(cromosoma_entero) #valor función objetivo
             valor_fit = funcion_fitness(valor_fo, poblacion)#valor fitness
             suma_fo += valor_fo
-            promedio = suma_fo/cant_pi
             if valor_fo > maximo:
                 maximo = valor_fo
                 crom_maximo_corrida = cromosoma
             if valor_fo < minimo:
                 minimo = valor_fo
+        promedio = suma_fo/cant_pi
         if crom_maximo_corrida > cromosoma_maximo:
             cromosoma_maximo = crom_maximo_corrida
         poblacion = seleccion_ruleta(poblacion)
