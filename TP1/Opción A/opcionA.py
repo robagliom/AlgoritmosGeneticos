@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import os
 import random
 import matplotlib.pyplot as plt
 plt.rcParams['figure.figsize'] = (16, 9)
@@ -7,12 +8,17 @@ plt.style.use('ggplot')
 import xlwt
 from xlwt import Workbook
 
+try:
+  os.stat("resultados")
+except:
+  os.mkdir("resultados")
+
 ### Variables globales ###
 long_cromosomas = 30
 #Crear población inicial (vamos a elegir cantidad inicial = 4)
 cant_pi = 10 #cantidad población inicial
 #Cantidad de corridas
-cant_corr = 200
+cant_corr = 100
 #Probabilidades
 #Crossover
 pc = 0.75
@@ -63,7 +69,7 @@ def exportar_datos(columnas, data,resultados=[]):
             sheet1.write(fila,col,d)
             col+=1
         fila+=1
-    wb.save('tabla_{}_corridas.xls'.format(cant_corr))
+    wb.save('resultados/tabla_{}_corridas.xls'.format(cant_corr))
 
     return
 
@@ -87,7 +93,7 @@ def graficar_resultados(data,titulo):
     plt.xlabel('Número de corrida')
     plt.ylabel('Valor función objetivo')
     plt.legend()
-    plt.savefig('grafica_{}_corridas.png'.format(cant_corr))
+    plt.savefig('resultados/grafica_{}_corridas.png'.format(cant_corr))
     return
 
 #Llenar ruleta
@@ -218,12 +224,6 @@ def programa_principal(cant_pi, cant_corridas):
                 minimo = valor_fo
         if crom_maximo_corrida > cromosoma_maximo:
             cromosoma_maximo = crom_maximo_corrida
-        resultados = []
-        resultados.append(["Suma Función objetivo",suma_fo, 1])#es el 100%
-        resultados.append(["Promedio",promedio,promedio/suma_fo])
-        resultados.append(["Máximo",maximo,maximo/suma_fo])
-        #columnas = ('Orden','Cromosoma','Valor Entero','Función Objetivo','Fitness')
-        #exportar_datos(columnas,data_tabla,resultados)
         poblacion = seleccion_ruleta(poblacion)
         #lleno tabla de la corrida
         tabla_corrida.append(c)
