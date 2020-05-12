@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
+import sys
+from pick import pick
 import random
 import matplotlib.pyplot as plt
 plt.rcParams['figure.figsize'] = (16, 9)
@@ -17,8 +19,6 @@ except:
 long_cromosomas = 30
 #Crear población inicial (vamos a elegir cantidad inicial = 4)
 cant_pi = 10 #cantidad población inicial
-#Cantidad de corridas
-cant_corr = 100
 #Probabilidades
 #Crossover
 pc = 0.75
@@ -55,7 +55,7 @@ def funcion_fitness(funcobj,poblacion):
     return fitness
 
 #Dibujo tabla
-def exportar_datos(columnas, data,resultados=[]):
+def exportar_datos(columnas, data,cant_corr,elitismo):
     wb = Workbook()
     sheet1= wb.add_sheet('Resultados')
     bold = xlwt.easyxf('font:bold 1')
@@ -71,11 +71,14 @@ def exportar_datos(columnas, data,resultados=[]):
             sheet1.write(fila,col,d)
             col+=1
         fila+=1
-    wb.save('resultados/tabla_{}_corridas.xls'.format(cant_corr))
+    if elitismo:
+        wb.save('resultados/tabla_{}_corridas_elitismo.xls'.format(cant_corr))
+    else:
+        wb.save('resultados/tabla_{}_corridas.xls'.format(cant_corr))
 
     return
 
-def graficar_resultados(data,titulo):
+def graficar_resultados(data,titulo,cant_corr,elitismo):
     #data = ["Corrida","Mínimo","Máximo","Cromosoma Máximo","Promedio"]
     plt.title(titulo)
     lista_minimos = []
@@ -95,7 +98,11 @@ def graficar_resultados(data,titulo):
     plt.xlabel('Número de corrida')
     plt.ylabel('Valor función objetivo')
     plt.legend()
-    plt.savefig('resultados/grafica_{}_corridas.png'.format(cant_corr))
+    if elitismo:
+        plt.savefig('resultados/grafica_{}_corridas_elitismo.png'.format(cant_corr))
+    else:
+        plt.savefig('resultados/grafica_{}_corridas.png'.format(cant_corr))
+    plt.close()
     return
 
 #Llenar ruleta
@@ -151,14 +158,6 @@ def crossover(n,cromosoma1,cromosoma2):
         corte = random.randrange(long_cromosomas)
         nuevo_cromosoma1[corte:]=cromosoma2[corte:]
         nuevo_cromosoma2[corte:]=cromosoma1[corte:]
-    """if probabilidad_mutacion():
-        nuevo_cromosoma1 = mutacion(nuevo_cromosoma1)
-    else:
-        nuevo_cromosoma1 = "".join(nuevo_cromosoma1)
-    if probabilidad_mutacion():
-        nuevo_cromosoma2 = mutacion(nuevo_cromosoma2)
-    else:
-        nuevo_cromosoma2 = "".join(nuevo_cromosoma2)"""
     nuevo_cromosoma1 = "".join(nuevo_cromosoma1)
     nuevo_cromosoma2 = "".join(nuevo_cromosoma2)
     return nuevo_cromosoma1,nuevo_cromosoma2
@@ -178,13 +177,6 @@ def seleccion_ruleta(poblacion):
     for i in range(0,len(seleccion),2):
         cromosoma1 = poblacion[seleccion[i]]
         cromosoma2 = poblacion[seleccion[i+1]]
-        """if probabilidad_crossover():
-            nuevo_cromosoma1,nuevo_cromosoma2 = crossover(1,cromosoma1,cromosoma2)
-            nueva_poblacion.append(nuevo_cromosoma1)
-            nueva_poblacion.append(nuevo_cromosoma1)
-        else:
-            nueva_poblacion.append(cromosoma1)
-            nueva_poblacion.append(cromosoma2)"""
         if probabilidad_crossover():
             cromosoma1,cromosoma2 = crossover(1,cromosoma1,cromosoma2)
         if probabilidad_mutacion():
@@ -198,63 +190,95 @@ def seleccion_ruleta(poblacion):
 #Argumentos:
 #cant_pi: int cantidad de elementos (cromosomas) de la población inicial
 #cant_corridas: int cantidad de corridas
-def programa_principal(cant_pi, cant_corridas):
-    #guardo los datos obetenidos en cada corrida
-    tabla_final = []
-    #Creo población inicial
-    poblacion =  crear_poblacion_inicial(cant_pi,long_cromosomas)
-    #seteo variable auxiliar para que no rompa
-    crom_maximo_corrida = poblacion[0]
-    cromosoma_maximo = crom_maximo_corrida
+#elitistmo: boolean si hay o no elitismo
+def programa_principal(cant_pi, cant_corridas, elitismo):
+    try:
+        #guardo los datos obetenidos en cada corrida
+        tabla_final = []
+        #Creo población inicial
+        poblacion =  crear_poblacion_inicial(cant_pi,long_cromosomas)
+        #seteo variable auxiliar para que no rompa
+        crom_maximo_corrida = poblacion[0]
+        cromosoma_maximo = crom_maximo_corrida
 
-    for c in range(cant_corridas):
-        suma_fo = 0
-        minimo = 2**30 #infinito
-        maximo = 0
-        tabla_corrida = []
-        #para elitismo
-        lista_fitness = []
-        for i in range(len(poblacion)):
-            cromosoma = poblacion[i] #binario
-            cromosoma_entero = int(poblacion[i],2) #decimal
-            valor_fo = funcion_objetivo(cromosoma_entero) #valor función objetivo
-            valor_fit = funcion_fitness(valor_fo, poblacion)#valor fitness
+        for c in range(cant_corridas):
+            suma_fo = 0
+            minimo = 2**30 #infinito
+            maximo = 0
+            tabla_corrida = []
             #para elitismo
-            lista_fitness.append([cromosoma,valor_fit])
-            suma_fo += valor_fo
-            if valor_fo > maximo:
-                maximo = valor_fo
-                crom_maximo_corrida = cromosoma
-            if valor_fo < minimo:
-                minimo = valor_fo
-        promedio = suma_fo/len(poblacion)
-        if crom_maximo_corrida > cromosoma_maximo:
-            cromosoma_maximo = crom_maximo_corrida
+            lista_fitness = []
+            for i in range(len(poblacion)):
+                cromosoma = poblacion[i] #binario
+                cromosoma_entero = int(poblacion[i],2) #decimal
+                valor_fo = funcion_objetivo(cromosoma_entero) #valor función objetivo
+                valor_fit = funcion_fitness(valor_fo, poblacion)#valor fitness
+                if elitismo:
+                    #para elitismo
+                    lista_fitness.append([cromosoma,valor_fit])
+                suma_fo += valor_fo
+                if valor_fo > maximo:
+                    maximo = valor_fo
+                    crom_maximo_corrida = cromosoma
+                if valor_fo < minimo:
+                    minimo = valor_fo
+            promedio = suma_fo/len(poblacion)
+            if crom_maximo_corrida > cromosoma_maximo:
+                cromosoma_maximo = crom_maximo_corrida
 
-        #Ordeno lista por la posición 1 (fitness) de mayor a menor
-        lista_fitness.sort(key=lambda x:x[1], reverse=True)
-        #Me quedo con los r "ere" cromosomas élit
-        poblacion_elite = []
-        for i in range(r):
-            poblacion_elite.append(lista_fitness[i][0])
-        #Mando a selección rulea los cromosomas comunes
-        poblacion_comun = []
-        for i in range(r,len(poblacion)):
-            poblacion_comun.append(lista_fitness[i][0])
-        poblacion = seleccion_ruleta(poblacion_comun)
-        #Vuelvo a unir la población común y elite
-        poblacion += poblacion_elite
-        #lleno tabla de la corrida
-        tabla_corrida.append(c)
-        tabla_corrida.append(minimo)
-        tabla_corrida.append(maximo)
-        tabla_corrida.append(crom_maximo_corrida)
-        tabla_corrida.append(promedio)
-        tabla_final.append(tabla_corrida)
-    columnas_final = ["Corrida","Mínimo","Máximo","Cromosoma Máximo","Promedio"]
-    exportar_datos(columnas_final,tabla_final)
-    titulo = "Cromosoma que genera el máximo: {}".format(cromosoma_maximo)
-    graficar_resultados(tabla_final,titulo)
-    return
+            if elitismo:
+                #Ordeno lista por la posición 1 (fitness) de mayor a menor
+                lista_fitness.sort(key=lambda x:x[1], reverse=True)
+                #Me quedo con los r "ere" cromosomas élit
+                poblacion_elite = []
+                for i in range(r):
+                    poblacion_elite.append(lista_fitness[i][0])
+                #Mando a selección rulea los cromosomas comunes
+                poblacion_comun = []
+                for i in range(r,len(poblacion)):
+                    poblacion_comun.append(lista_fitness[i][0])
+                poblacion = seleccion_ruleta(poblacion_comun)
+                #Vuelvo a unir la población común y elite
+                poblacion += poblacion_elite
+            else:
+                poblacion = seleccion_ruleta(poblacion)
+            #lleno tabla de la corrida
+            tabla_corrida.append(c)
+            tabla_corrida.append(minimo)
+            tabla_corrida.append(maximo)
+            tabla_corrida.append(crom_maximo_corrida)
+            tabla_corrida.append(promedio)
+            tabla_final.append(tabla_corrida)
+        columnas_final = ["Corrida","Mínimo","Máximo","Cromosoma Máximo","Promedio"]
+        exportar_datos(columnas_final,tabla_final,cant_corridas,elitismo)
+        titulo = "Cromosoma que genera el máximo: {}".format(cromosoma_maximo)
+        graficar_resultados(tabla_final,titulo,cant_corridas,elitismo)
 
-programa_principal(cant_pi,cant_corr)
+        return "Algoritmo corrido con éxito, los resultados fueron guardados"
+    except:
+        return "Ups, algo salió mal"
+
+def menu():
+    que_hacer = 'Algoritmos genéticos'
+    opciones_que_hacer = ['NORMAL', 'CON ELITISMO', 'X SALIR']
+    opcion_que_hacer, index = pick(opciones_que_hacer, que_hacer)
+    if opcion_que_hacer == 'NORMAL':
+        elitismo = False
+    elif opcion_que_hacer == 'CON ELITISMO':
+        elitismo = True
+    else:
+        sys.exit()
+    cuantas_corridas = 'Cuántas corridas va a hacer?'
+    corridas = ['20','100','200', 'X VOLVER']
+    cant_corr, index = pick(corridas, cuantas_corridas)
+    if cant_corr == 'X VOLVER':
+        menu()
+    else:
+        resultado=programa_principal(cant_pi,int(cant_corr),elitismo)
+        seguir, index = pick(['SI','X SALIR'], '{}. Continuar?'.format(resultado))
+        if seguir == 'SI':
+            menu()
+        else:
+            sys.exit()
+
+menu()
