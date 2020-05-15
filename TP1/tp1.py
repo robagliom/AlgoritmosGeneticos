@@ -143,16 +143,6 @@ def mutacion(cromosoma):
 # Operador Crossover
 # Argumentos: cromosomas a cruzar
 def crossover(cromosoma1,cromosoma2):
-    '''
-    nuevo_cromosoma1 = list(cromosoma1) # Convierte de string a lista
-    nuevo_cromosoma2 = list(cromosoma2)
-
-    corte = random.randrange(long_cromosomas) # Punto de corte
-    nuevo_cromosoma1[corte:]=cromosoma2[corte:] # Reemplaza desde 'corte a fin'
-    nuevo_cromosoma2[corte:]=cromosoma1[corte:]
-    nuevo_cromosoma1 = "".join(nuevo_cromosoma1) # Convierte de lista a string
-    nuevo_cromosoma2 = "".join(nuevo_cromosoma2)
-    '''
     corte = random.randrange(long_cromosomas) # Punto de corte
     nuevo_cromosoma1 = cromosoma1[:corte] + cromosoma2[corte:]
     nuevo_cromosoma2 = cromosoma2[:corte] + cromosoma1[corte:]
