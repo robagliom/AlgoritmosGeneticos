@@ -15,32 +15,37 @@ try:
 except:
   os.mkdir("resultados")
 
-# Variables globales
-long_cromosomas = 30 # Longitud de los cromosomas
-cant_pi = 10 # Cantidad población inicial
-pc = 0.75 # Probabilidad de crossover
-pm = 0.05 # Probabilidad de mutación
-
-r=2 #elitismo
+### Variables globales ###
+long_cromosomas = 30
+#Crear población inicial (vamos a elegir cantidad inicial = 4)
+cant_pi = 10 #cantidad población inicial
+#Probabilidades
+#Crossover
+pc = 0.75
+#Mutación
+pm = 0.05
+#elitismo
+r=2
 
 # Función objetivo
 def funcion_objetivo(x):
     return (x/((2**30)-1))**2
-
-# Función para crear población inicial
-def crear_poblacion_inicial():
-    poblacion_inicial = []
-    for _ in range(cant_pi):
-        cromosoma = "" # Auxiliar para crear cada cromosoma
-        for _ in range(long_cromosomas):
-            cromosoma += str(random.randrange(2)) # Concatena random 0 o 1
-        poblacion_inicial.append(cromosoma) # Agrega cromosoma a la poblacion
+#Función para crear población inicial
+#Parámetros: cantidad-->cantidad de cromosomas
+#            longitud-->longitud de cada cromosoma
+def crear_poblacion_inicial(cantidad,longitud):
+    poblacion_inicial = list() #lista población inicial
+    for i in range(cantidad):
+        cromosoma_inicial = "" #auxiliar para crear cada cromosoma
+        for i in range(longitud):
+            #genero un gen aleatorio y lo agrego al cromosoma
+            cromosoma_inicial += str(random.randrange(2)) #genera random: 0 o 1
+        poblacion_inicial.append(cromosoma_inicial)
     return poblacion_inicial
 
-# Función para calcular el fitness
-# Argumentos: funcobj = valor de la función objetivo, poblacion = lista de cromosomas binario
+#recibe funcobj:valor de la función objetivo, poblacion: lista de cromosomas binario
 def funcion_fitness(funcobj,poblacion):
-    suma_fo = 0 # Acumulado
+    suma_fo = 0 #suma funciones objetivo
     for i in range(len(poblacion)):
         suma_fo += funcion_objetivo(int(poblacion[i],2))
     try:
@@ -49,20 +54,20 @@ def funcion_fitness(funcobj,poblacion):
         fitness = 0
     return fitness
 
-# Exportar datos
-def exportar_datos(columnas,data,cant_corr,elitismo):
+#Dibujo tabla
+def exportar_datos(columnas, data,cant_corr,elitismo):
     wb = Workbook()
     sheet1= wb.add_sheet('Resultados')
     bold = xlwt.easyxf('font:bold 1')
     fila = 0
     col = 0
-    for c in columnas: # c es cada título en columnas (Corrida, Mínimo, Máximo, Cromosoma Máximo, Promedio)
-        sheet1.write(fila,col,c,bold)
+    for c in columnas:
+        sheet1.write(fila,col,c, bold)
         col+=1
     fila+=1
-    for d_fila in data: # d_fila es cada fila de data
+    for d_fila in data:
         col = 0
-        for d in d_fila: # d es cada celda de la fila
+        for d in d_fila:
             sheet1.write(fila,col,d)
             col+=1
         fila+=1
@@ -70,6 +75,7 @@ def exportar_datos(columnas,data,cant_corr,elitismo):
         wb.save('resultados/tabla_{}_corridas_elitismo.xls'.format(cant_corr))
     else:
         wb.save('resultados/tabla_{}_corridas.xls'.format(cant_corr))
+
     return
 
 def graficar_resultados(data,titulo,cant_corr,elitismo):
@@ -102,15 +108,15 @@ def graficar_resultados(data,titulo,cant_corr,elitismo):
 #Llenar ruleta
 def llenar_ruleta(poblacion):
     cant_casilleros = 100
-    ruleta = [] # lista con casilleros --> 100%
-    pos_fin = 0 # auxiliar para completar ruleta
+    ruleta = [] #lista con casilleros --> 100%
+    nueva_poblacion = []
+    pos_fin = 0 #auxiliar para completar ruleta
     for i in range(len(poblacion)):
-        x = int(poblacion[i],2) # Valor x (Cromosoma pasado a entero)
-        valor_fo = funcion_objetivo(x) # Valor función objetivo
-        fitness_i = funcion_fitness(valor_fo,poblacion) # Valor función fitness
-        cant_casilleros_i = round(fitness_i*cant_casilleros) # Porcentaje de casilleros con respecto a 100
+        valor_fo = funcion_objetivo(int(poblacion[i],2))
+        fitness_i = funcion_fitness(valor_fo,poblacion)
+        cant_casilleros_i = round(fitness_i*cant_casilleros) #porcentaje de casilleros con respecto a 100
         #Lleno la ruleta con la posición del cromosoma
-        for _ in range(pos_fin,pos_fin+cant_casilleros_i):
+        for j in range(pos_fin,cant_casilleros_i+pos_fin):
             ruleta.append(i)
         pos_fin += cant_casilleros_i
     return ruleta
@@ -131,33 +137,30 @@ def probabilidad_mutacion():
 #Argumentos
 #cromosoma: el cromosoma a mutar
 def mutacion(cromosoma):
-    gen = random.randrange(long_cromosomas)
-    cromosoma_mut = list(cromosoma) # String a Lista
-    if cromosoma_mut[gen]=='0':
-        cromosoma_mut[gen]='1'
+    num_aleat = random.randrange(len(cromosoma))
+    cromosoma_mut = list(cromosoma)
+    if cromosoma_mut[num_aleat]=='0':
+        cromosoma_mut[num_aleat]='1'
     else:
-        cromosoma_mut[gen]='0'
-    cromosoma_mut = "".join(cromosoma_mut) # Lista a String
+        cromosoma_mut[num_aleat]='0'
+    cromosoma_mut = "".join(cromosoma_mut)
     return cromosoma_mut
 
-# Operador Crossover
-# Argumentos: cromosomas a cruzar
-def crossover(cromosoma1,cromosoma2):
-    '''
-    nuevo_cromosoma1 = list(cromosoma1) # Convierte de string a lista
+#Operador Crossover
+#Argumentos:
+#n: número de cortes
+#cromosoma1 y cromosoma2: cromosomas para hacer crossover
+#Return: dos cromosomas hijos
+def crossover(n,cromosoma1,cromosoma2):
+    nuevo_cromosoma1 = list(cromosoma1)
     nuevo_cromosoma2 = list(cromosoma2)
-
-    corte = random.randrange(long_cromosomas) # Punto de corte
-    nuevo_cromosoma1[corte:]=cromosoma2[corte:] # Reemplaza desde 'corte a fin'
-    nuevo_cromosoma2[corte:]=cromosoma1[corte:]
-    nuevo_cromosoma1 = "".join(nuevo_cromosoma1) # Convierte de lista a string
+    for i in range(n):
+        corte = random.randrange(long_cromosomas)
+        nuevo_cromosoma1[corte:]=cromosoma2[corte:]
+        nuevo_cromosoma2[corte:]=cromosoma1[corte:]
+    nuevo_cromosoma1 = "".join(nuevo_cromosoma1)
     nuevo_cromosoma2 = "".join(nuevo_cromosoma2)
-    '''
-    corte = random.randrange(long_cromosomas) # Punto de corte
-    nuevo_cromosoma1 = cromosoma1[:corte] + cromosoma2[corte:]
-    nuevo_cromosoma2 = cromosoma2[:corte] + cromosoma1[corte:]
-
-    return nuevo_cromosoma1, nuevo_cromosoma2
+    return nuevo_cromosoma1,nuevo_cromosoma2
 
 #Método de selección
 #Argumentos:
@@ -171,11 +174,11 @@ def seleccion_ruleta(poblacion):
         seleccion.append(ruleta[num])
     nueva_poblacion = []
     #Tomamos de a pares
-    for i in range(0,len(seleccion),2): #para ir saltando de a 2
+    for i in range(0,len(seleccion),2):
         cromosoma1 = poblacion[seleccion[i]]
         cromosoma2 = poblacion[seleccion[i+1]]
         if probabilidad_crossover():
-            cromosoma1,cromosoma2 = crossover(cromosoma1,cromosoma2)
+            cromosoma1,cromosoma2 = crossover(1,cromosoma1,cromosoma2)
         if probabilidad_mutacion():
             cromosoma1 = mutacion(cromosoma1)
         if probabilidad_mutacion():
@@ -185,26 +188,31 @@ def seleccion_ruleta(poblacion):
     return nueva_poblacion
 
 #Argumentos:
+#cant_pi: int cantidad de elementos (cromosomas) de la población inicial
 #cant_corridas: int cantidad de corridas
 #elitistmo: boolean si hay o no elitismo
-def programa_principal(cant_corridas, elitismo):
+def programa_principal(cant_pi, cant_corridas, elitismo):
     try:
-        crom_maximo_corrida = '' # cromosoma máximo de cada corrida
-        cromosoma_maximo = '' # cromosoma maximo total
-        maximo_total = 0
-        tabla_final = [] # tabla con los datos obetenidos en cada corrida
-        poblacion = crear_poblacion_inicial() # Crea población inicial
+        #guardo los datos obetenidos en cada corrida
+        tabla_final = []
+        #Creo población inicial
+        poblacion =  crear_poblacion_inicial(cant_pi,long_cromosomas)
+        #seteo variable auxiliar para que no rompa
+        crom_maximo_corrida = poblacion[0]
+        cromosoma_maximo = crom_maximo_corrida
+
         for c in range(cant_corridas):
             suma_fo = 0
-            minimo = 999999 # Número grande para la primera comparación
+            minimo = 2**30 #infinito
             maximo = 0
-            fila_tabla = []
-            lista_fitness = [] # para elitismo
-            for i in range(cant_pi):
-                cromosoma = poblacion[i]
-                x = int(cromosoma,2) # Valor x (Cromosoma pasado a entero)
-                valor_fo = funcion_objetivo(x) # Valor función objetivo
-                valor_fit = funcion_fitness(valor_fo, poblacion) # Valor fitness
+            tabla_corrida = []
+            #para elitismo
+            lista_fitness = []
+            for i in range(len(poblacion)):
+                cromosoma = poblacion[i] #binario
+                cromosoma_entero = int(poblacion[i],2) #decimal
+                valor_fo = funcion_objetivo(cromosoma_entero) #valor función objetivo
+                valor_fit = funcion_fitness(valor_fo, poblacion)#valor fitness
                 if elitismo:
                     #para elitismo
                     lista_fitness.append([cromosoma,valor_fit])
@@ -214,11 +222,9 @@ def programa_principal(cant_corridas, elitismo):
                     crom_maximo_corrida = cromosoma
                 if valor_fo < minimo:
                     minimo = valor_fo
-            promedio = suma_fo/cant_pi
-            #if crom_maximo_corrida > cromosoma_maximo:
-            if maximo > maximo_total:
-                maximo_total = maximo
-                cromosoma_maximo = crom_maximo_corrida #cromosoma_maximo es el que se imprime en la grafica
+            promedio = suma_fo/len(poblacion)
+            if crom_maximo_corrida > cromosoma_maximo:
+                cromosoma_maximo = crom_maximo_corrida
 
             if elitismo:
                 #Ordeno lista por la posición 1 (fitness) de mayor a menor
@@ -235,15 +241,14 @@ def programa_principal(cant_corridas, elitismo):
                 #Vuelvo a unir la población común y elite
                 poblacion += poblacion_elite
             else:
-                poblacion = seleccion_ruleta(poblacion) #SELECCION, CROSSOVER, MUTACION
-
-            # Llena fila de la tabla
-            fila_tabla.append(c)
-            fila_tabla.append(minimo)
-            fila_tabla.append(maximo)
-            fila_tabla.append(crom_maximo_corrida)
-            fila_tabla.append(promedio)
-            tabla_final.append(fila_tabla) # Agrega fila a la tabla
+                poblacion = seleccion_ruleta(poblacion)
+            #lleno tabla de la corrida
+            tabla_corrida.append(c)
+            tabla_corrida.append(minimo)
+            tabla_corrida.append(maximo)
+            tabla_corrida.append(crom_maximo_corrida)
+            tabla_corrida.append(promedio)
+            tabla_final.append(tabla_corrida)
         columnas_final = ["Corrida","Mínimo","Máximo","Cromosoma Máximo","Promedio"]
         exportar_datos(columnas_final,tabla_final,cant_corridas,elitismo)
         titulo = "Cromosoma que genera el máximo: {}".format(cromosoma_maximo)
@@ -269,7 +274,7 @@ def menu():
     if cant_corr == 'X VOLVER':
         menu()
     else:
-        resultado=programa_principal(int(cant_corr),elitismo)
+        resultado=programa_principal(cant_pi,int(cant_corr),elitismo)
         seguir, index = pick(['SI','X SALIR'], '{}. Continuar?'.format(resultado))
         if seguir == 'SI':
             menu()
