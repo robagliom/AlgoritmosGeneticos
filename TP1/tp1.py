@@ -79,15 +79,12 @@ def graficar_resultados(data,titulo,cant_corr,elitismo):
     lista_maximos = []
     lista_promedios = []
     for d in data:
-        lista_minimos.append([d[0],d[1]])
-        lista_maximos.append([d[0],d[2]])
-        lista_promedios.append([d[0],d[4]])
-    xmin,ymin = zip(*[i for i in lista_minimos])
-    xmax,ymax = zip(*[i for i in lista_maximos])
-    xprom,yprom = zip(*[i for i in lista_promedios])
-    plt.plot(xmin,ymin,'ro-',markersize=0.5,lw=0.5,color='red',label="Mínimos")
-    plt.plot(xmax,ymax,'ro-',markersize=0.5,lw=0.5,color='blue',label="Máximos")
-    plt.plot(xprom,yprom,'ro-',markersize=0.5,lw=0.5,color='green',label="Promedios")
+        lista_minimos.append(d[1])
+        lista_maximos.append(d[2])
+        lista_promedios.append(d[4])
+    plt.plot(lista_minimos,'ro-',markersize=0.5,lw=0.5,color='red',label="Mínimos")
+    plt.plot(lista_maximos,'ro-',markersize=0.5,lw=0.5,color='blue',label="Máximos")
+    plt.plot(lista_promedios,'ro-',markersize=0.5,lw=0.5,color='green',label="Promedios")
     plt.grid(True)
     plt.xlabel('Número de corrida')
     plt.ylabel('Valor función objetivo')
@@ -101,7 +98,7 @@ def graficar_resultados(data,titulo,cant_corr,elitismo):
 
 #Llenar ruleta
 def llenar_ruleta(poblacion):
-    cant_casilleros = 100
+    cant_casilleros = 100 # 100% de la ruleta
     ruleta = [] # lista con casilleros --> 100%
     pos_fin = 0 # auxiliar para completar ruleta
     for i in range(len(poblacion)):
