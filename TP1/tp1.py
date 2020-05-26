@@ -149,10 +149,14 @@ def crossover(cromosoma1,cromosoma2):
 #Método de selección
 #Argumentos:
 #poblacion: lista de poblacion actual
-def seleccion_ruleta(poblacion):
+def seleccion_ruleta(poblacion,elitismo):
     ruleta = llenar_ruleta(poblacion)
     seleccion = []
-    for i in range(len(poblacion)):
+    if elitismo:
+        cant = int(len(poblacion)-r)
+    else:
+        cant = len(poblacion)
+    for i in range(cant):
         #Saco un random de la ruleta
         num = random.randrange(len(ruleta))
         seleccion.append(ruleta[num])
@@ -216,13 +220,13 @@ def programa_principal(cant_corridas, elitismo):
                     poblacion_elite.append(lista_fitness[i][0])
                 #Mando a selección rulea los cromosomas comunes
                 poblacion_comun = []
-                for i in range(r,len(poblacion)):
-                    poblacion_comun.append(lista_fitness[i][0])
-                poblacion = seleccion_ruleta(poblacion_comun)
+                #for i in range(r,len(poblacion)):
+                #    poblacion_comun.append(lista_fitness[i][0])
+                poblacion = seleccion_ruleta(poblacion,elitismo)
                 #Vuelvo a unir la población común y elite
                 poblacion += poblacion_elite
             else:
-                poblacion = seleccion_ruleta(poblacion) #SELECCION, CROSSOVER, MUTACION
+                poblacion = seleccion_ruleta(poblacion,elitismo) #SELECCION, CROSSOVER, MUTACION
 
             # Llena fila de la tabla
             fila_tabla.append(c)
