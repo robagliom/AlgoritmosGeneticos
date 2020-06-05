@@ -3,7 +3,7 @@
 
 <p>Utilizando una computadora, resolver el siguiente problema:</p>
 
-<i>Cuáles son los elementos de la lista siguiente que cargaremos en una mochila de 4200 cm3 de manera que su valor en $ sea máximo.</i>
+<p><i>Cuáles son los elementos de la lista siguiente que cargaremos en una mochila de 4200 cm3 de manera que su valor en $ sea máximo.</i></p>
 <img src="tablaObjetos.png"/>
 
 <p>Para su solución, utilizar un <b>procedimiento exhaustivo</b> que consiste en evaluar para cada subconjunto de elementos el valor correspondiente y, posteriormente, <b>clasificando los subconjuntos por su valor de mayor a menor</b>, encontrar cuál es el subconjunto solución.</p>
