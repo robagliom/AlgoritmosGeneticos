@@ -66,8 +66,6 @@ def algoritmo_greedy(Vmax,lista_objetos):
             vol_acum += ob[0]
             valor += ob[1]
             lista_solucion.append(ob[0:2])
-        else:
-            pass
     return valor,vol_acum,lista_solucion
 
 ####################
