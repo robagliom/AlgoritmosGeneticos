@@ -7,8 +7,10 @@ import random
 import matplotlib.pyplot as plt
 plt.rcParams['figure.figsize'] = (16, 9)
 plt.style.use('ggplot')
+#Manejo de excel
 import xlwt
 from xlwt import Workbook
+from xlrd import open_workbook
 
 try:
   os.stat("resultados")
@@ -43,6 +45,23 @@ dict_ciudades = {
                 24:'Viedma',
 }
 #for i in range(len(dict_ciudades)): print(i,dict_ciudades.get(i+1))
+
+ #Traemos excel con datos a memoria
+url_excel = "Datos/TablaCapitales.xlsx"
+excel = open_workbook(url_excel)
+hoja = excel.sheet_by_name('Distancias')
+
+#Recibe el indice de la ciudad
+#Devuelve lista ordenada con las distancias (índice lista = índice dict_ciudades)
+def buscar_distancia_excel(indice_ciudad):
+    for i in range(len(dict_ciudades)+1):
+        indice_ciudad_excel = hoja.cell_value(rowx=i, colx=0)
+        if indice_ciudad == indice_ciudad_excel:
+            distancias = []
+            for j in range(1,25):
+                valor_celda = hoja.cell_value(rowx=i,colx=j)
+                distancias.append(int(valor_celda))
+    return distancias
 
 def buscar_ruta(ciudad=None):
     print("Ciudad", ciudad, dict_ciudades.get(ciudad))
