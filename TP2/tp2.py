@@ -36,6 +36,7 @@ def busqueda_exhaustiva(Vmax,objetos):
     combinaciones_posibles = generar_combinaciones(objetos)
     for combinacion_i in combinaciones_posibles:
         for lista_i in combinacion_i:
+            #para cada combinación veo el valor que genera, si supera la capacidad devuelve 0
             valor_max_i,vol_acum_i = maximo_valor_posible(lista_i,Vmax)
             if valor_max_i > valor_max:
                 valor_max = valor_max_i
