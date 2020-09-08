@@ -52,7 +52,7 @@ excel = open_workbook(url_excel)
 hoja = excel.sheet_by_name('Distancias')
 
 #Recibe el indice de la ciudad
-#Devuelve lista ordenada con las distancias (índice lista = índice dict_ciudades)
+#Devuelve lista ordenada con las distancias (índice lista + 1 = índice dict_ciudades)
 def buscar_distancia_excel(indice_ciudad):
     for i in range(len(dict_ciudades)+1):
         indice_ciudad_excel = hoja.cell_value(rowx=i, colx=0)
