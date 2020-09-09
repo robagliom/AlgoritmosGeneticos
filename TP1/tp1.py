@@ -218,10 +218,6 @@ def programa_principal(cant_corridas, elitismo):
                 poblacion_elite = []
                 for i in range(r):
                     poblacion_elite.append(lista_fitness[i][0])
-                #Mando a selección rulea los cromosomas comunes
-                poblacion_comun = []
-                #for i in range(r,len(poblacion)):
-                #    poblacion_comun.append(lista_fitness[i][0])
                 poblacion = seleccion_ruleta(poblacion,elitismo)
                 #Vuelvo a unir la población común y elite
                 poblacion += poblacion_elite

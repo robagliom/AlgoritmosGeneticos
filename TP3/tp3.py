@@ -52,20 +52,75 @@ excel = open_workbook(url_excel)
 hoja = excel.sheet_by_name('Distancias')
 
 #Recibe el indice de la ciudad
-#Devuelve lista ordenada con las distancias (índice lista + 1 = índice dict_ciudades)
+#Devuelve lista de tuplas (int: indice_ciudad,int: distancia)
 def buscar_distancia_excel(indice_ciudad):
-    for i in range(len(dict_ciudades)+1):
+    for i in range(1,25):
         indice_ciudad_excel = hoja.cell_value(rowx=i, colx=0)
         if indice_ciudad == indice_ciudad_excel:
             distancias = []
             for j in range(1,25):
                 valor_celda = hoja.cell_value(rowx=i,colx=j)
-                distancias.append(int(valor_celda))
+                distancias.append((j,int(valor_celda)))
+            break
     return distancias
 
-def buscar_ruta(ciudad=None):
-    print("Ciudad", ciudad, dict_ciudades.get(ciudad))
-    return "resultado"
+def distancia_entre_ciudades(indice_ciudad_1,indice_ciudad_2):
+    return int(hoja.cell_value(rowx=indice_ciudad_1,colx=indice_ciudad_2))
+
+#Funcion que actualiza lista de ciudades visitadas
+def actualizar_ciudades_visitadas(lista,indice_ciudad):
+    lista_actualizada = []
+    for i in lista:
+        if i[0] == indice_ciudad:
+            lista_actualizada.append((i[0],True))
+        else:
+            lista_actualizada.append(i)
+    return lista_actualizada
+
+#Devuelve la ciudad que está a menor distancia
+def proxima_ciudad(lista_distancias, ciudades_visitadas):
+    #ordeno por menor distancia
+    lista_distancias = sorted(lista_distancias, key=lambda x: x[1])
+    for i in lista_distancias:
+        visitada = list(filter(lambda x: x[0]==i[0] and x[1]==False,ciudades_visitadas))
+        if len(visitada) == 1:
+            return i
+    #elegir la menor de lista_distancias y que no esté en ciudades_visitadas
+    return
+
+#Devuelve true si quedan ciudades, false si ya se recorrieron todas
+def quedan_ciudades_por_visitar(lista):
+    ciudades_no_visitadas = list(filter(lambda x: x[1]==False,lista))
+    if len(ciudades_no_visitadas) > 0:
+        return True
+    return False
+
+def buscar_ruta(ciudad_origen=None):
+    #Seteo lista para mantener ciudades visitadas
+    lista_ciudades_visitadas = []
+    for i in range(len(dict_ciudades)): 
+            lista_ciudades_visitadas.append((i+1,False))
+    #Si eligió ciudad de origen
+    if ciudad_origen:
+        #Pongo en true ciudad de origen para no visitarla
+        lista_ciudades_visitadas = actualizar_ciudades_visitadas(lista_ciudades_visitadas,ciudad_origen)
+        distancia_total = 0
+        prox_ciudad = ciudad_origen
+        while quedan_ciudades_por_visitar(lista_ciudades_visitadas):
+            #Busco distancias desde la ciudad elegida
+            distancias_ciudad_origen = buscar_distancia_excel(prox_ciudad)
+            #Ciudad de menor a mayor por la distancia
+            tupla_prox_ciudad = proxima_ciudad(distancias_ciudad_origen,lista_ciudades_visitadas)
+            #Índice próxima ciudad
+            prox_ciudad = tupla_prox_ciudad[0]
+            #Actualizo distancia recorrida
+            distancia_total += int(tupla_prox_ciudad[1])
+            #Actualizo ciudades visitadas
+            lista_ciudades_visitadas = actualizar_ciudades_visitadas(lista_ciudades_visitadas,prox_ciudad)
+        #Agrego la distanca de la última ciudad a la de origen
+        distancia_total += distancia_entre_ciudades(prox_ciudad,ciudad_origen)
+        
+    return "Distancia total recorrida: {}".format(distancia_total)
 
 def recorrido_min_alg_genet():
     print('Algoritmos genéticos')
