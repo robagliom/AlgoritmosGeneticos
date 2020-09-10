@@ -3,15 +3,13 @@
 import os
 import sys
 from pick import pick
-import random
-import matplotlib.pyplot as plt
-plt.rcParams['figure.figsize'] = (16, 9)
-plt.style.use('ggplot')
 
 #Mapas
 import mapas
 #Búsqueda heurística
 import busqueda_heuristica
+#Algorítmo genético
+import algoritmo_genetico
 #Diccionarios
 import datos
 #Excel
@@ -41,8 +39,10 @@ def buscar_ruta(ciudad_origen=None):
     return #"Distancia total recorrida: {}\nOrden de visitas: {}".format(distancia_total,ciudades_visitadas)
 
 def recorrido_min_alg_genet():
-    print('Algoritmos genéticos')
-    return "resultado"
+    #dibujar mapa resultados
+    ciudades_visitadas,distancia_total = algoritmo_genetico.buscar_ruta()
+    dibujar_mapa(ciudades_visitadas,distancia_total)
+    return
 
 #Recibe lista ordenada con los índices de las ciudades
 def dibujar_mapa(lista_ciudades,distancia_total):
@@ -81,14 +81,14 @@ def menu():
             else:
                 #Ciudad = index_submenu_1
                 buscar_ruta(index_submenu_1+1)
-                seguir, _ = pick(['SI','X SALIR'], '. Continuar?')
+                seguir, _ = pick(['SI','X SALIR'], 'Continuar?')
                 if seguir == 'SI':
                     menu()
                 else:
                     sys.exit()
         elif index_submenu==1:
             buscar_ruta()
-            seguir, _ = pick(['SI','X SALIR'], '. Continuar?')
+            seguir, _ = pick(['SI','X SALIR'], 'Continuar?')
             if seguir == 'SI':
                 menu()
             else:
@@ -97,8 +97,8 @@ def menu():
             menu()
     elif index_menu_principal == 1:
         #Buscar recorrido mínimo con algoritmos genéticos
-        resultado=recorrido_min_alg_genet()
-        seguir, _ = pick(['SI','X SALIR'], '{}. Continuar?'.format(resultado))
+        recorrido_min_alg_genet()
+        seguir, _ = pick(['SI','X SALIR'], 'Continuar?')
         if seguir == 'SI':
             menu()
         else:
