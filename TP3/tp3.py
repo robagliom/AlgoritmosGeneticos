@@ -12,6 +12,8 @@ import xlwt
 from xlwt import Workbook
 from xlrd import open_workbook
 
+import mapas
+
 try:
   os.stat("resultados")
 except:
@@ -100,6 +102,8 @@ def buscar_ruta(ciudad_origen=None):
     lista_ciudades_visitadas = []
     for i in range(len(dict_ciudades)): 
             lista_ciudades_visitadas.append((i+1,False))
+    #Mantengo orden de visitas
+    ciudades_visitadas = [ciudad_origen]
     #Si eligió ciudad de origen
     if ciudad_origen:
         #Pongo en true ciudad de origen para no visitarla
@@ -117,14 +121,25 @@ def buscar_ruta(ciudad_origen=None):
             distancia_total += int(tupla_prox_ciudad[1])
             #Actualizo ciudades visitadas
             lista_ciudades_visitadas = actualizar_ciudades_visitadas(lista_ciudades_visitadas,prox_ciudad)
+            #Actualizo lista orden
+            ciudades_visitadas.append(prox_ciudad)
         #Agrego la distanca de la última ciudad a la de origen
         distancia_total += distancia_entre_ciudades(prox_ciudad,ciudad_origen)
-        
-    return "Distancia total recorrida: {}".format(distancia_total)
+        #Agrego la ciudad de origen al final de ciudades visitadas
+        ciudades_visitadas.append(ciudad_origen)
+    dibujar_mapa(ciudades_visitadas,distancia_total)
+    return "Distancia total recorrida: {}\nOrden de visitas: {}".format(distancia_total,ciudades_visitadas)
 
 def recorrido_min_alg_genet():
     print('Algoritmos genéticos')
     return "resultado"
+
+#Recibe lista ordenada con los índices de las ciudades
+def dibujar_mapa(lista_ciudades,distancia_total):
+    #Creo mapa
+    url_mapa = mapas.crear_mapa(lista_ciudades,distancia_total)
+    import webbrowser
+    return webbrowser.open(url_mapa, new=2, autoraise=True)
 
 def menu():
     menu_principal = 'El problema del viajante'
@@ -144,20 +159,18 @@ def menu():
         _, index_submenu = pick(op_submenu,submenu)
         if index_submenu == 0:
             submenu_1 = 'Eliga ciudad de origen'
-            op_submenu_1 =[
-                'X VOLVER'
-            ]
+            op_submenu_1 =[]
             #Agrego lista de ciudades al submenú
             for i in range(len(dict_ciudades)): 
                 op_submenu_1.append(dict_ciudades.get(i+1))
-
-            _, index_submenu_1 = pick(op_submenu_1,submenu_1)
-            if index_submenu_1 == 0:
+            op_submenu_1.append('X VOLVER')
+            op_submenu_1, index_submenu_1 = pick(op_submenu_1,submenu_1)
+            if op_submenu_1 == 'X VOLVER':
                 #volver
                 menu()
             else:
                 #Ciudad = index_submenu_1
-                resultado=buscar_ruta(index_submenu_1)
+                resultado=buscar_ruta(index_submenu_1+1)
                 seguir, _ = pick(['SI','X SALIR'], '{}. Continuar?'.format(resultado))
                 if seguir == 'SI':
                     menu()

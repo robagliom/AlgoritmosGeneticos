@@ -4,7 +4,7 @@
 #Manejo de mapa
 import folium
 
-def crear_mapa(lista):
+def crear_mapa(lista,distancia_total):
     #Mapa
     m = folium.Map(
                     #Argentina
@@ -14,9 +14,11 @@ def crear_mapa(lista):
     #Agrego marcadores
     ciudad_origen = lista[0]
     localizaciones = []
+    ciudades = []
     for i in lista:
         localizacion = tuple(dict_geo_ciudades.get(i)[0])
         nombre_ciudad = str(dict_geo_ciudades.get(i)[1])
+        ciudades.append(nombre_ciudad)
         if i == ciudad_origen:
             folium.Marker(localizacion,popup=nombre_ciudad,icon=folium.Icon(color='green',icon_color='green')).add_to(m)
         else:
@@ -24,6 +26,14 @@ def crear_mapa(lista):
         localizaciones.append(localizacion)
     #Agrego líneas
     folium.PolyLine(localizaciones, color="red", weight=2.5, opacity=1).add_to(m)
+
+    #Agrego text   
+    title_html = '''
+                    <h3 align="center" style="font-size:16px"><b>Distancia total recorrida: {} km</b></h3>
+                    <p align="justify"><b>Recorrido:</b> {}</p>
+                '''.format(distancia_total,ciudades)
+
+    m.get_root().html.add_child(folium.Element(title_html))
 
     url_mapa = "resultados/mapa.html"
     m.save(url_mapa)
