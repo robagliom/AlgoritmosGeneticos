@@ -17,3 +17,5 @@ El objetivo es encontrar una ruta que, comenzando y terminando en una ciudad con
 * Cromosomas: permutaciones de 23 números naturales del 1 al 23 donde cada gen es una ciudad.
 * Las frecuencias de crossover y de mutación quedan a criterio del grupo.
 * Se deberá usar crossover cíclico.
+
+<h3>Para ejecutar: programa_principal.py</h3>
