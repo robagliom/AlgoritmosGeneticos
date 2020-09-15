@@ -12,6 +12,8 @@ longitud_cromosomas = 24
 pc = 0.75 
 #Probabilidad de mutación
 pm = 0.05 
+#Elitismo
+r=2
 
 def buscar_ruta():
     ciudades_visitadas = []
