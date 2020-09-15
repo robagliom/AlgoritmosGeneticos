@@ -26,7 +26,6 @@ def buscar_ruta(ciudad_origen=None):
         ciudades_visitadas,distancia_total = busqueda_heuristica.buscar_ruta(ciudad_origen)
     #Si no se elige ciudad hay que devolver la ruta mínima
     else:
-        print("sin ciudad de origen")
         distancia_total = 999999 #seteo número grande
         ciudades_visitadas = []
         for c in datos.dict_ciudades:
@@ -38,9 +37,9 @@ def buscar_ruta(ciudad_origen=None):
     dibujar_mapa(ciudades_visitadas,distancia_total)
     return #"Distancia total recorrida: {}\nOrden de visitas: {}".format(distancia_total,ciudades_visitadas)
 
-def recorrido_min_alg_genet():
+def recorrido_min_alg_genet(elitismo=False):
     #dibujar mapa resultados
-    ciudades_visitadas,distancia_total = algoritmo_genetico.buscar_ruta()
+    ciudades_visitadas,distancia_total = algoritmo_genetico.buscar_ruta(elitismo)
     dibujar_mapa(ciudades_visitadas,distancia_total)
     return
 
@@ -96,8 +95,16 @@ def menu():
         else:
             menu()
     elif index_menu_principal == 1:
-        #Buscar recorrido mínimo con algoritmos genéticos
-        recorrido_min_alg_genet()
+        submenu = 'Buscar recorrido mínimo con algoritos genéticos'
+        op_submenu = ['Sin elitismo', 'Con elitismo', 'X VOLVER']
+        _, index_submenu = pick(op_submenu,submenu)
+        if index_submenu == 0:
+            recorrido_min_alg_genet()
+        elif index_submenu == 1:
+            recorrido_min_alg_genet(True)
+        else:
+            #volver
+            menu()
         seguir, _ = pick(['SI','X SALIR'], 'Continuar?')
         if seguir == 'SI':
             menu()
