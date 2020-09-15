@@ -32,8 +32,8 @@ def crear_poblacion_inicial():
 #x: cromosoma
 def funcion_objetivo(x):
     valor_fo = 0
-    for i in range(1,len(x)):
-        valor_fo += excel.distancia_entre_ciudades(x[i],x[i])
+    for i in range(1,len(x)-1):
+        valor_fo += excel.distancia_entre_ciudades(x[i],x[i+1])
     #Agrego distancia de la última ciudad a la ciudad origen
     valor_fo += excel.distancia_entre_ciudades(x[-1],x[0])
     return valor_fo
@@ -144,14 +144,12 @@ def seleccion_ruleta(poblacion,elitismo):
     return nueva_poblacion
 
 def buscar_ruta(elitismo=False):
-    crom_maximo_corrida = '' # cromosoma máximo de cada corrida
-    ciudades_visitadas = [] # cromosoma maximo total
-    distancia_total = 0
+    crom_minimo_corrida = [] # cromosoma mínima distancia de cada corrida
+    ciudades_visitadas = [] # cromosoma mínima distancia total
+    distancia_total = 99999999 # Número grande para la primera comparación
     poblacion = crear_poblacion_inicial() # Crea población inicial
     for _ in range(cantidad_corridas):
-        suma_fo = 0
-        minimo = 999999 # Número grande para la primera comparación
-        maximo = 0
+        minimo = 99999999 # Número grande para la primera comparación
         lista_fitness = [] # para elitismo
         for i in range(tamano_poblacion):
             cromosoma = poblacion[i]
@@ -160,17 +158,14 @@ def buscar_ruta(elitismo=False):
             if elitismo:
                 #para elitismo
                 lista_fitness.append([cromosoma,valor_fit])
-            suma_fo += valor_fo
-            if valor_fo > maximo:
-                maximo = valor_fo
-                crom_maximo_corrida = cromosoma
             if valor_fo < minimo:
                 minimo = valor_fo
-            
-        if maximo > distancia_total:
-            distancia_total = maximo
-            ciudades_visitadas = crom_maximo_corrida #cromosoma_maximo es el que se imprime en la grafica
-            
+                crom_minimo_corrida = cromosoma        
+
+        if minimo < distancia_total:
+            distancia_total = minimo
+            ciudades_visitadas = crom_minimo_corrida #cromosoma_minimo es el que se imprime en la grafica
+
         if elitismo:
             #Ordeno lista por la posición 1 (fitness) de mayor a menor
             lista_fitness.sort(key=lambda x:x[1], reverse=True)
