@@ -32,7 +32,7 @@ def crear_poblacion_inicial():
 #x: cromosoma
 def funcion_objetivo(x):
     valor_fo = 0
-    for i in range(1,len(x)-1):
+    for i in range(len(x)-1):
         valor_fo += excel.distancia_entre_ciudades(x[i],x[i+1])
     #Agrego distancia de la última ciudad a la ciudad origen
     valor_fo += excel.distancia_entre_ciudades(x[-1],x[0])
